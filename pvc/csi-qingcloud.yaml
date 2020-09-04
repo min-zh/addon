@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-csi-qingcloud
+spec:
+  storageClassName: csi-qingcloud 
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-csi-qingcloud
+spec:
+  selector:
+    matchLabels:
+      app: nginx-csi-qingcloud
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-csi-qingcloud
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /mnt
+          name: pvc-data
+      volumes:
+      - name: pvc-data
+        persistentVolumeClaim:
+          claimName: pvc-csi-qingcloud
+

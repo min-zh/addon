@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-neonsan
+spec:
+  storageClassName: csi-neonsan 
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-neonsan
+spec:
+  selector:
+    matchLabels:
+      app: nginx-neonsan
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-neonsan
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /mnt
+          name: pvc-data
+      volumes:
+      - name: pvc-data
+        persistentVolumeClaim:
+          claimName: pvc-neonsan
+          readOnly: false

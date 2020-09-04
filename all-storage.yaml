@@ -1,0 +1,202 @@
+apiVersion: kubekey.kubesphere.io/v1alpha1
+kind: Cluster
+metadata:
+  name: sample
+spec:
+  hosts:
+  - {name: storage, address: 192.168.0.21, internalAddress: 192.168.0.21 }
+  roleGroups:
+    etcd:
+    - storage
+    master: 
+    - storage
+    worker:
+    - storage
+  controlPlaneEndpoint:
+    domain: lb.kubesphere.local
+    address: ""
+    port: "6443"
+  kubernetes:
+    version: v1.17.9
+    imageRepo: kubesphere
+    clusterName: cluster.local
+  network:
+    plugin: calico
+    kubePodsCIDR: 10.233.64.0/18
+    kubeServiceCIDR: 10.233.0.0/18
+  registry:
+    registryMirrors: []
+    insecureRegistries: []
+  addons:
+  - name: csi-qingcloud
+    namespace: kube-system
+    sources:
+      chart:
+        name: csi-qingcloud
+        repo: https://charts.kubesphere.io/test
+        values:
+        - config.qy_access_key_id=MBKTPJWCIRIEDQYQKXYL
+        - config.qy_secret_access_key=cqEnHYZhdVCVif9qCUge3LNU2G1Cb9VzKY2RnBdX
+        - config.zone=pek3a
+        #- sc.isDefaultClass=false
+  - name: csi-qingcloud-pvc
+    sources:
+      yaml:
+        path:
+        - /root/addon/pvc/csi-qingcloud.yaml
+  - name: nfs-client
+    namespace: kube-system
+    sources: 
+      chart: 
+        name: nfs-client-provisioner
+        repo: https://charts.kubesphere.io/main
+        values:
+        #- storageClass.defaultClass=true
+        - nfs.server=192.168.0.27
+        - nfs.path=/mnt/csi/
+  - name: nfs-client-pvc
+    sources:
+      yaml:
+        path:
+        - /root/addon/pvc/nfs-client.yaml
+  - name: glusterfs-sc
+    sources:
+      yaml:
+        path: 
+        - /root/addon/sc/glusterfs.yaml
+  - name: glusterfs-pvc
+    sources:
+      yaml:
+        path: 
+        - /root/addon/pvc/glusterfs.yaml
+  - name: rbd-provisioner
+    namespace: kube-system
+    sources:
+      chart:
+        name: rbd-provisioner
+        repo: https://charts.kubesphere.io/test
+        values:
+        - ceph.mon=192.168.0.12:6789  
+        - ceph.adminKey=QVFBS1JkdGRvV0lySUJBQW5LaVpSKzBRY2tjWmd6UzRJdndmQ2c9PQ==
+        - ceph.userKey=QVFBS1JkdGRvV0lySUJBQW5LaVpSKzBRY2tjWmd6UzRJdndmQ2c9PQ==
+  - name: rbd-pvc
+    sources:
+      yaml:
+        path: 
+        - /root/addon/pvc/rbd.yaml
+  - name: local-volume
+    sources:
+      yaml:
+        path: 
+        - /root/addon/plugin/local-volume.yaml
+  - name: local-volume-pvc
+    sources:
+      yaml:
+        path: 
+        - /root/addon/pvc/local-volume.yaml
+  - name: ceph-csi-rbd
+    namespace: kube-system
+    sources:
+      chart:
+        name: ceph-csi-rbd
+        repo: https://ceph.github.io/csi-charts
+        values: /root/addon/plugin/ceph-csi-config.yaml
+  - name: ceph-csi-rbd-sc 
+    sources:
+      yaml:
+        path: 
+        - /root/addon/sc/ceph-csi-rbd.yaml
+  - name: ceph-csi-rbd-pvc 
+    sources:
+      yaml:
+        path: 
+        - /root/addon/pvc/ceph-csi-rbd.yaml
+  - name: csi-neonsan
+    namespace: kube-system
+    sources:
+      chart:
+        name: csi-neonsan
+        path: /root/helm-charts/src/test/
+        values:
+        - sc.isDefaultClass=false
+        - driver.node.repository=csiplugin/csi-neonsan-centos
+  - name: csi-neonsan-pvc 
+    sources:
+      yaml:
+        path: 
+        - /root/addon/pvc/csi-neonsan.yaml
+---
+apiVersion: installer.kubesphere.io/v1alpha1
+kind: ClusterConfiguration
+metadata:
+  name: ks-installer
+  namespace: kubesphere-system
+  labels:
+    version: v3.0.0
+spec:
+  local_registry: ""
+  persistence:
+    storageClass: ""
+  authentication:
+    jwtSecret: ""
+  etcd:
+    monitoring: true
+    endpointIps: localhost
+    port: 2379
+    tlsEnable: true
+  common:
+    es:
+      elasticsearchDataReplicas: 1
+      elasticsearchDataVolumeSize: 20Gi
+      elasticsearchMasterReplicas: 1
+      elasticsearchMasterVolumeSize: 4Gi
+      elkPrefix: logstash
+      logMaxAge: 7
+    mysqlVolumeSize: 20Gi
+    minioVolumeSize: 20Gi
+    etcdVolumeSize: 20Gi
+    openldapVolumeSize: 2Gi
+    redisVolumSize: 2Gi
+  console:
+    enableMultiLogin: true # enable/disable multi login
+    port: 30880
+  alerting:
+    enabled: false
+  auditing:
+    enabled: false
+  devops:
+    enabled: false
+    jenkinsMemoryLim: 2Gi
+    jenkinsMemoryReq: 1500Mi
+    jenkinsVolumeSize: 8Gi
+    jenkinsJavaOpts_Xms: 512m
+    jenkinsJavaOpts_Xmx: 512m
+    jenkinsJavaOpts_MaxRAM: 2g
+  events:
+    enabled: false
+    ruler:
+      enabled: false
+      replicas: 2
+  logging:
+    enabled: false
+    logsidecarReplicas: 2
+  metrics_server:
+    enabled: true
+  monitoring:
+    prometheusReplicas: 1
+    prometheusMemoryRequest: 400Mi
+    prometheusVolumeSize: 20Gi
+    alertmanagerReplicas: 1
+  multicluster:
+    clusterRole: none  # host | member | none
+  networkpolicy:
+    enabled: false
+  notification:
+    enabled: false
+  openpitrix:
+    enabled: false
+  servicemesh:
+    enabled: false
+  telemetry:
+    enabled: true
+

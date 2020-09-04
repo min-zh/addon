@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-ceph-csi-rbd
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: csi-rbd-sc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ceph-csi-rbd
+spec:
+  selector:
+    matchLabels:
+      app: nginx-ceph-csi-rbd
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-ceph-csi-rbd
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /mnt
+          name: pvc-data
+      volumes:
+      - name: pvc-data
+        persistentVolumeClaim:
+          claimName: pvc-ceph-csi-rbd
+          readOnly: false
+

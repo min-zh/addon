@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-rbd
+spec:
+  storageClassName: rbd
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-rbd
+spec:
+  selector:
+    matchLabels:
+      app: nginx-rbd
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-rbd
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /mnt
+          name: pvc-data
+      volumes:
+      - name: pvc-data
+        persistentVolumeClaim:
+          claimName: pvc-rbd
+          readOnly: false
+
