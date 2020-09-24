@@ -1,0 +1,7 @@
+driver:
+  node: 
+    repository: "csiplugin/csi-neonsan-centos"  # <--ToBeReplaced According to Node OS-->
+
+sc:
+  isDefaultClass: false
+

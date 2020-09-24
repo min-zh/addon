@@ -1,0 +1,6 @@
+config:
+  qy_access_key_id: "MBKTPJWCIRIEDQYQKXYL"    # <--ToBeReplaced-->
+  qy_secret_access_key: "cqEnHYZhdVCVif9qCUge3LNU2G1Cb9VzKY2RnBdX"  # <--ToBeReplaced ->
+  zone: "pek3a"  # <--ToBeReplaced-->
+sc:
+  isDefaultClass: false

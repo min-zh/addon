@@ -34,96 +34,58 @@ spec:
       chart:
         name: csi-qingcloud
         repo: https://charts.kubesphere.io/test
-        values:
-        - config.qy_access_key_id=MBKTPJWCIRIEDQYQKXYL
-        - config.qy_secret_access_key=cqEnHYZhdVCVif9qCUge3LNU2G1Cb9VzKY2RnBdX
-        - config.zone=pek3a
-        #- sc.isDefaultClass=false
-  - name: csi-qingcloud-pvc
-    sources:
-      yaml:
-        path:
-        - /root/addon/pvc/csi-qingcloud.yaml
+        values: /root/addon/plugin/csi-qingcloud.yaml
   - name: nfs-client
     namespace: kube-system
     sources: 
       chart: 
         name: nfs-client-provisioner
         repo: https://charts.kubesphere.io/main
-        values:
-        #- storageClass.defaultClass=true
-        - nfs.server=192.168.0.27
-        - nfs.path=/mnt/csi/
-  - name: nfs-client-pvc
-    sources:
-      yaml:
-        path:
-        - /root/addon/pvc/nfs-client.yaml
+        values: /root/addon/plugin/nfs-client.yaml
   - name: glusterfs-sc
     sources:
       yaml:
         path: 
         - /root/addon/sc/glusterfs.yaml
-  - name: glusterfs-pvc
-    sources:
-      yaml:
-        path: 
-        - /root/addon/pvc/glusterfs.yaml
   - name: rbd-provisioner
     namespace: kube-system
     sources:
       chart:
         name: rbd-provisioner
         repo: https://charts.kubesphere.io/test
-        values:
-        - ceph.mon=192.168.0.12:6789  
-        - ceph.adminKey=QVFBS1JkdGRvV0lySUJBQW5LaVpSKzBRY2tjWmd6UzRJdndmQ2c9PQ==
-        - ceph.userKey=QVFBS1JkdGRvV0lySUJBQW5LaVpSKzBRY2tjWmd6UzRJdndmQ2c9PQ==
-  - name: rbd-pvc
-    sources:
-      yaml:
-        path: 
-        - /root/addon/pvc/rbd.yaml
+        values: /root/addon/plugin/rbd-provisioner.yaml
   - name: local-volume
     sources:
       yaml:
         path: 
         - /root/addon/plugin/local-volume.yaml
-  - name: local-volume-pvc
-    sources:
-      yaml:
-        path: 
-        - /root/addon/pvc/local-volume.yaml
   - name: ceph-csi-rbd
     namespace: kube-system
     sources:
       chart:
         name: ceph-csi-rbd
         repo: https://ceph.github.io/csi-charts
-        values: /root/addon/plugin/ceph-csi-config.yaml
-  - name: ceph-csi-rbd-sc 
-    sources:
+        values: /root/addon/plugin/ceph-csi.yaml
       yaml:
         path: 
         - /root/addon/sc/ceph-csi-rbd.yaml
-  - name: ceph-csi-rbd-pvc 
-    sources:
-      yaml:
-        path: 
-        - /root/addon/pvc/ceph-csi-rbd.yaml
   - name: csi-neonsan
     namespace: kube-system
     sources:
       chart:
         name: csi-neonsan
         path: /root/helm-charts/src/test/
-        values:
-        - sc.isDefaultClass=false
-        - driver.node.repository=csiplugin/csi-neonsan-centos
-  - name: csi-neonsan-pvc 
+        values: /root/addon/plugin/csi-neonsan.yaml
+  - name: create-test-pvc
     sources:
       yaml:
         path: 
+        - /root/addon/pvc/csi-qingcloud.yaml
+        - /root/addon/pvc/nfs-client.yaml
+        - /root/addon/pvc/glusterfs.yaml
+        - /root/addon/pvc/rbd.yaml
+        - /root/addon/pvc/local-volume.yaml
+        - /root/addon/pvc/ceph-csi-rbd.yaml
         - /root/addon/pvc/csi-neonsan.yaml
 ---
 apiVersion: installer.kubesphere.io/v1alpha1

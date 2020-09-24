@@ -1,0 +1,7 @@
+ceph:
+  mon: "192.168.0.12:6789"    # <--ToBeReplaced-->
+  adminKey: QVFBS1JkdGRvV0lySUJBQW5LaVpSKzBRY2tjWmd6UzRJdndmQ2c9PQ==    # <--ToBeReplaced-->
+  userKey: QVFBS1JkdGRvV0lySUJBQW5LaVpSKzBRY2tjWmd6UzRJdndmQ2c9PQ==    # <--ToBeReplaced-->
+
+sc:
+  isDefault: false
